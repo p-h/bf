@@ -23,3 +23,6 @@ main = hspec $ describe "Lib" $ do
         decrease (Band [] n []) `shouldBe` Band [] (-1) []
         decrease (Band [n .. 3] (-123) [-1 .. 0])
             `shouldBe` Band [0 .. 3] (-124) [-1 .. 0]
+    it "can progress" $ do
+        nextInstruction  (Band "" '+' "+") `shouldBe` Band "+" '+' ""
+        nextInstruction  (Band "++" '.' "++") `shouldBe` Band "++." '+' "+"

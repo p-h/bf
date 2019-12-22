@@ -5,6 +5,7 @@ module Lib
     , evalToken
     , moveRight
     , moveLeft
+    , nextInstruction
     , increase
     , decrease
     )
