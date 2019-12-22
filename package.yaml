@@ -1,0 +1,44 @@
+name:       bf
+version:    0.1.0.0
+github:     "p-h/bf"
+license:    BSD3
+author:     "Philippe Hürlimann"
+maintainer: "p@hurlimann.org"
+copyright:  "2019 Philippe Hürlimann"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+synopsis:    Short description of your package
+category:    Web
+description: Please see the README on GitHub at <https://github.com/p-h/bf#readme>
+
+dependencies:
+- base
+
+library:
+  source-dirs: src
+
+executables:
+  bf-exe:
+    main:         Main.hs
+    source-dirs:  app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - bf
+
+tests:
+  bf-test:
+    main:         Spec.hs
+    source-dirs:  test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - bf
+    - hspec
