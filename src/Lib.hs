@@ -14,8 +14,6 @@ module Lib
     )
 where
 
-import           Debug.Trace
-
 data Op = MoveRight
         | MoveLeft
         | Increase
@@ -26,33 +24,33 @@ data Op = MoveRight
     deriving (Show, Eq)
 
 data Band a = Band
-    { prefix :: [a]
-    , suffix :: [a]
+    { prefix :: ![a]
+    , suffix :: ![a]
     }
     deriving (Show, Eq)
 
 data State = State
-    { ops :: Band Op
-    , band :: Band Int
+    { ops :: !(Band Op)
+    , band :: !(Band Int)
     , input :: String
-    , output :: String
+    , output :: !String
     }
     deriving(Show, Eq)
 
 run :: String -> String -> String
-run code inp = 
-  let init = State (Band [] (parse code)) (Band [] [0]) inp ""
-  in output $ execute init
+run code inp =
+    let init = State (Band [] (parse code)) (Band [] [0]) inp ""
+    in  output $ execute init
 
 execute :: State -> State
-execute state = case (ops state) of
-        Band _ [] -> state
-        _         -> execute $ step state
+execute state = case ops state of
+    Band _ [] -> state
+    _         -> execute $ step state
 
 splitOnMatchingBracket :: String -> (String, String)
 splitOnMatchingBracket l = go ([], l) 0
   where
-    go (prefix, (x : xs)) level
+    go (prefix, x : xs) level
         | x == '['               = go (prefix ++ "[", xs) $ level + 1
         | x == ']' && level == 0 = (prefix, xs)
         | x == ']' && level /= 0 = go (prefix ++ "]", xs) $ level - 1
@@ -79,30 +77,31 @@ parse (c : cs) = case token of
 step :: State -> State
 step state@(State code@(Band _ (token : _)) band'@(Band prefix (cell : suffix)) inp out)
     = case token of
-        MoveRight -> state { ops = nextInstruction code, band = moveRight band' }
-        MoveLeft  -> state { ops = nextInstruction code, band = moveLeft band' }
-        Increase  -> state { ops = nextInstruction code, band = increase band' }
-        Decrease  -> state { ops = nextInstruction code, band = decrease band' }
-        Output -> state {ops = nextInstruction code, output = (out ++ [toEnum cell])}
+        MoveRight ->
+            state { ops = nextInstruction code, band = moveRight band' }
+        MoveLeft -> state { ops = nextInstruction code, band = moveLeft band' }
+        Increase -> state { ops = nextInstruction code, band = increase band' }
+        Decrease -> state { ops = nextInstruction code, band = decrease band' }
+        Output ->
+            state { ops = nextInstruction code, output = out ++ [toEnum cell] }
         Input ->
             let (i : is) = inp
             in  State (nextInstruction code)
-                      (Band prefix $ (fromEnum i) : suffix)
+                      (Band prefix $ fromEnum i : suffix)
                       is
                       out
-        Loop ops' -> traceShow state $
-            let b = band $ loop state { ops = Band [] ops' }
-            in state { ops = nextInstruction code, band = b }
+        Loop ops' ->
+            let s = loop state { ops = Band [] ops' }
+            in  s { ops = nextInstruction code }
 
 loop :: State -> State
-loop state =  until
-    ((==0) . head . suffix . band)
-    (\s -> until (null . suffix . ops) execute s { ops = ops state })
-    state
+loop state = until ((== 0) . head . suffix . band)
+                   (\s -> execute s { ops = ops state })
+                   state
 
 nextInstruction :: Band a -> Band a
 nextInstruction (Band prev (current : following)) =
-    Band (prev ++ [current]) $ following
+    Band (prev ++ [current]) following
 
 moveRight :: Enum a => Band a -> Band a
 moveRight (Band p [c         ]) = Band (p ++ [c]) [toEnum 0]
