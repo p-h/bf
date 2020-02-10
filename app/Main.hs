@@ -8,4 +8,5 @@ main :: IO ()
 main = do
     (filename : _) <- getArgs
     file           <- readFile filename
-    eval file
+    inp            <- getContents
+    putStrLn $ run file inp
