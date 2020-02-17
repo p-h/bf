@@ -43,9 +43,7 @@ run code inp =
     in  output $ execute init
 
 execute :: State -> State
-execute state = case ops state of
-    Band _ [] -> state
-    _         -> execute $ step state
+execute = until (null . suffix . ops) step
 
 splitOnMatchingBracket :: String -> (String, String)
 splitOnMatchingBracket l = go ([], l) 0
