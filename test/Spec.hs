@@ -44,8 +44,11 @@ main = hspec $ describe "Lib" $ do
         splitOnMatchingBracket "foo[bar]baz]boo"
             `shouldBe` ("foo[bar]baz", "boo")
 
-    it "can run hello world" $ do
+    it "can run simple programs" $ do
         let code = "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.---.+++++++..+++."
             in run code "" `shouldBe` "hello"
         let code = "+++++++++++++++++++++++++++++++++>+++[<.>-]"
             in run code "" `shouldBe` "!!!"
+        let code = ",>,>,>,>,<<<<.>.>.>.>."
+            inp = "hello"
+            in run code inp `shouldBe `"hello"
